@@ -3,12 +3,19 @@ import torch.nn as nn
 class CNNModel(nn.Module):
     def __init__(self):
         super(CNNModel, self).__init__()
-        self.conv1 = nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1)
-        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.fc = nn.Linear(16 * 16 * 16, 10)
+        self.conv_layers = nn.Sequential(
+            nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+        )
+        self.fc_layers = nn.Sequential(
+            nn.Linear(32 * 14 * 14, 128),
+            nn.ReLU(),
+            nn.Linear(128, 10),
+        )
 
     def forward(self, x):
-        x = self.pool(torch.relu(self.conv1(x)))
-        x = x.view(-1, 16 * 16 * 16)
-        x = self.fc(x)
+        x = self.conv_layers(x)
+        x = x.view(x.size(0), -1)  # Flatten
+        x = self.fc_layers(x)
         return x

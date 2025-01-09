@@ -44,7 +44,56 @@ deep-learning-optimization/
 │
 ├── main.py                 # Main script for training and evaluating models
 ├── README.md               # Project description
+```
 
+## Installation
 
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/ReapeRAlan/deep-learning-optimization.git
+   cd deep-learning-optimization
+   ```
 
-#
+2. Create a virtual environment and activate it:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate   # On Linux/Mac
+   venv\Scripts\activate      # On Windows
+   ```
+
+3. Install the dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+## Usage
+
+1. Modify the `config.py` file in the `utils/` folder to set hyperparameters like learning rate, number of epochs, and batch size.
+
+2. Run the `main.py` file to start training:
+   ```bash
+   python main.py
+   ```
+
+3. Visualize training results using the utilities in `plot_utils.py`.
+
+## Requirements
+
+- Python 3.8 or higher
+- PyTorch
+- NumPy
+- Matplotlib
+- Torchvision
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request.
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+## Acknowledgments
+
+This project was inspired by advancements in deep learning optimization techniques and the need for practical implementations of state-of-the-art algorithms.
+

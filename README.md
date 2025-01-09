@@ -1,2 +1,7 @@
-# deep-learning-optimization
-A comprehensive project focused on implementing and experimenting with various deep learning algorithms and architectures, including CNNs, RNNs, autoencoders, GANs, and optimization techniques.
+# Deep Learning Optimization
+This repository contains Python implementations of deep learning models and optimization techniques. It covers:
+- Convolutional Neural Networks (CNNs)
+- Recurrent Neural Networks (RNNs)
+- Autoencoders
+- GANs
+- Optimization techniques (Adam, SGD, Dropout, etc.)

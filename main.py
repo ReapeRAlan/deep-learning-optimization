@@ -3,8 +3,9 @@ from torch import nn
 from utils.config import CONFIG
 from utils.metrics import calculate_accuracy, calculate_confusion_matrix
 from utils.plot_utils import plot_loss, plot_confusion_matrix
-from data.data_loader import load_data, create_dataloaders
+from data.data_loader import load_and_preprocess_data, create_dataloaders
 from models.nn_model import initialize_nn
+from collections import Counter
 
 def train_model(model, train_loader, criterion, optimizer, device):
     model.train()
@@ -37,6 +38,7 @@ def evaluate_model(model, test_loader, device):
             outputs = model(inputs)
             _, preds = torch.max(outputs, 1)
 
+            # Agregar a las listas
             y_true.extend(labels.cpu().numpy())
             y_pred.extend(preds.cpu().numpy())
 
@@ -44,7 +46,7 @@ def evaluate_model(model, test_loader, device):
     accuracy = calculate_accuracy(y_true, y_pred)
     cm = calculate_confusion_matrix(y_true, y_pred)
 
-    return accuracy, cm
+    return accuracy, cm, y_true, y_pred
 
 
 if __name__ == "__main__":
@@ -53,9 +55,18 @@ if __name__ == "__main__":
     device = CONFIG["device"]
     print(f"Usando dispositivo: {device}")
 
-    # Cargar datos
-    (X_train, y_train), (X_test, y_test) = load_data(CONFIG["data_path"], CONFIG["test_size"])
+    # Cargar y preprocesar datos
+    data_path = CONFIG["data_path"]
+    X_train, X_test, y_train, y_test = load_and_preprocess_data(data_path, CONFIG["test_size"])
     train_loader, test_loader = create_dataloaders(X_train, y_train, X_test, y_test, CONFIG["batch_size"])
+
+    # Verificar la distribución de clases
+    print("Distribución de clases en el conjunto de entrenamiento:")
+    print(Counter(y_train))
+
+    print("Distribución de clases en el conjunto de prueba:")
+    print(Counter(y_test))
+    print(f"Tamaño total de test_loader: {len(test_loader.dataset)}")
 
     # Inicializar modelo, criterio y optimizador
     model = initialize_nn(CONFIG["input_dim"], CONFIG["hidden_dim"], CONFIG["output_dim"]).to(device)
@@ -70,13 +81,12 @@ if __name__ == "__main__":
         print(f"Época {epoch+1}/{CONFIG['num_epochs']} - Pérdida: {train_loss:.4f}")
 
     # Evaluación
-    accuracy, cm = evaluate_model(model, test_loader, device)
+    accuracy, cm, y_true, y_pred = evaluate_model(model, test_loader, device)
     print(f"Precisión en el conjunto de prueba: {accuracy:.4f}")
 
     # Graficar pérdida y matriz de confusión
-    plot_loss(train_losses, train_losses, CONFIG["plot_save_path"])  # Aquí se usa el mismo gráfico para ilustrar
-    class_names = [f"Clase {i}" for i in range(CONFIG["output_dim"])]
-    plot_confusion_matrix(cm, class_names, CONFIG["plot_save_path"])
+    plot_loss(train_losses, train_losses, CONFIG["plot_save_path"])
+    plot_confusion_matrix(y_true, y_pred, save_path=CONFIG["plot_save_path"])
 
     # Guardar modelo
     torch.save(model.state_dict(), CONFIG["save_model_path"])

@@ -20,7 +20,6 @@ def load_and_preprocess_data(file_path, test_size=0.2):
     X = scaler.fit_transform(X)
     print(f"Dimensiones de X después de procesar: {X.shape}")
 
-
     # Dividir en conjuntos de entrenamiento y prueba
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, stratify=y, random_state=42)
 
@@ -51,7 +50,7 @@ def create_dataloaders(X_train, y_train, X_test, y_test, batch_size=32):
 # Ejemplo de uso
 if __name__ == "__main__":
     # Ruta del archivo de datos
-    data_path = "./data/datasets/diabetes_dataset.csv"
+    data_path = "./data/datasets/diabetes_dataset_corrected.csv"
 
     # Cargar y preprocesar datos
     X_train, X_test, y_train, y_test = load_and_preprocess_data(data_path, test_size=0.2)

@@ -6,6 +6,10 @@ from utils.plot_utils import plot_loss, plot_confusion_matrix
 from data.data_loader import load_and_preprocess_data, create_dataloaders
 from models.nn_model import initialize_nn
 from collections import Counter
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import classification_report, confusion_matrix, roc_curve, roc_auc_score
 
 def train_model(model, train_loader, criterion, optimizer, device):
     model.train()
@@ -47,6 +51,34 @@ def evaluate_model(model, test_loader, device):
     cm = calculate_confusion_matrix(y_true, y_pred)
 
     return accuracy, cm, y_true, y_pred
+
+
+def test_model_with_custom_data(model, device):
+    # Datos de prueba personalizados
+    test_data = np.array([
+        [2, 120, 70, 30, 80, 25.5, 0.672, 33],  # Ejemplo 1
+        [4, 85, 60, 25, 100, 28.2, 0.122, 40], # Ejemplo 2
+        [1, 140, 80, 35, 120, 22.0, 0.452, 28] # Ejemplo 3
+    ])
+    
+    # Convertir a tensores
+    inputs = torch.tensor(test_data, dtype=torch.float32).to(device)
+
+    # Realizar predicciones
+    model.eval()
+    with torch.no_grad():
+        outputs = model(inputs)
+        _, predictions = torch.max(outputs, 1)
+        probabilities = torch.nn.functional.softmax(outputs, dim=1).cpu().numpy()
+    
+    # Mostrar resultados
+    print("\n=== Resultados de Predicción con Datos Personalizados ===")
+    for i, (prediction, prob) in enumerate(zip(predictions.cpu().numpy(), probabilities)):
+        prob_diabetes = prob[1]
+        print(f"Ejemplo {i+1}: Predicción = {'Diabetes' if prediction == 1 else 'No Diabetes'}, "
+              f"Probabilidad = {prob_diabetes:.2f}")
+
+    return predictions.cpu().numpy(), probabilities
 
 
 if __name__ == "__main__":
@@ -91,3 +123,11 @@ if __name__ == "__main__":
     # Guardar modelo
     torch.save(model.state_dict(), CONFIG["save_model_path"])
     print(f"Modelo guardado en: {CONFIG['save_model_path']}")
+
+    # Cargar modelo guardado para pruebas
+    model.load_state_dict(torch.load(CONFIG["save_model_path"], map_location=device))
+
+    # Pruebas con datos personalizados
+    test_model_with_custom_data(model, device)
+    torch.save(model.state_dict(), CONFIG["save_model_path"])
+

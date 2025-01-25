@@ -1,0 +1,13 @@
+diabetes:
+
+Caso	Embarazos	Glucosa	Presión Arterial	Espesor Piel	Insulina	BMI	Pedigrí Diabetes	Edad	Comentario Clínico	Probabilidad de Diabetes
+1	3	120	80	25	130	27.0	0.3	35	Moderado riesgo	65%
+2	7	180	70	40	200	40.0	0.8	55	Diabetes probable	99%
+3	0	85	60	20	15	22.5	0.1	25	Bajo riesgo	8%
+4	2	140	75	30	95	29.5	0.5	40	Riesgo moderado	70%
+5	5	160	85	35	150	35.0	0.7	50	Alta probabilidad	92%
+6	1	100	65	20	80	24.0	0.2	30	Bajo riesgo	12%
+7	8	190	95	50	250	45.5	1.2	60	Diabetes casi seguro	99.8%
+8	4	150	80	35	120	32.0	0.6	45	Riesgo alto	85%
+9	6	175	78	40	180	39.0	0.9	52	Alta probabilidad	95%
+10	0	90	60	15	10	21.0	0.1	20	Muy bajo riesgo	5%

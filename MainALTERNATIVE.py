@@ -31,6 +31,9 @@ scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 
+# Guardar el escalador
+joblib.dump(scaler, 'scaler.pkl')
+
 # Crear el modelo de red neuronal con mayor número de iteraciones y early stopping
 mlp = MLPClassifier(max_iter=3000, random_state=42, early_stopping=True, validation_fraction=0.2)
 

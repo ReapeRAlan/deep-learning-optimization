@@ -1,3 +1,6 @@
+# Como instalar las herramientas (requirements.txt)
+Instalar herramientas necesarias existentes en requirements.txt:
+pip install -r requirements.txt
 # Advanced Deep Learning Optimization Guide
 
 This repository provides a sophisticated implementation of diverse deep learning models and advanced optimization methodologies, aiming to enhance accuracy and reduce training time. The project examines innovative architectures and algorithms, facilitating cutting-edge experimentation and deployment across a wide array of applications.

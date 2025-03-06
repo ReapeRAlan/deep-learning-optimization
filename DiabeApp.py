@@ -1,186 +1,247 @@
 import streamlit as st
 import pandas as pd
-import joblib
+import requests
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
+from datetime import datetime
 
-# Umbral fijo encontrado (Youden ~ 0.4911)
-FIXED_THRESHOLD = 0.4911
+# Configuración de la API
+API_BASE_URL = "http://localhost:8000"  # Cambiar según despliegue
+PREDICT_ENDPOINT = f"{API_BASE_URL}/predict"
+CHAT_ENDPOINT = f"{API_BASE_URL}/chat"
 
-# Cargar el pipeline calibrado (modelo + escalado, etc.)
-model = joblib.load('diabetes_model_pipeline_calibrated.pkl')
+# Configurar tema de visualización
+plt.style.use('ggplot')
+sns.set_palette("viridis")
 
-# Inicializar o cargar el historial en session_state
+# Inicializar estados de sesión
 if 'history' not in st.session_state:
     st.session_state['history'] = pd.DataFrame(columns=[
-        'Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin',
-        'BMI', 'DiabetesPedigreeFunction', 'Age', 
-        'Glucose2', 'AgeBMI',   # columnas nuevas
-        'Probability', 'Prediction', 'Threshold'
+        'Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness',
+        'Insulin', 'BMI', 'DiabetesPedigreeFunction', 'Age',
+        'Probability', 'Diagnóstico', 'Threshold', 'Timestamp'
     ])
 
-# Título de la aplicación
-st.title("Predicción de Diabetes (Umbral Fijo)")
+if 'chat_history' not in st.session_state:
+    st.session_state.chat_history = []
 
-st.write(f"Umbral de decisión fijado en: **{FIXED_THRESHOLD:.4f}**")
-st.write("Ingrese los datos del paciente o cargue un archivo CSV para analizar múltiples casos.")
-st.write("**Nota**: Se replican las mismas transformaciones de features usadas en el entrenamiento (Glucose2, AgeBMI).")
+# Diseño de la interfaz
+st.set_page_config(page_title="DiabeDoc", page_icon="🩺", layout="wide")
+st.title("DiabeDoc - Sistema Integrado de Diabetes y Nutrición")
 
-# Subir un archivo CSV opcional
-uploaded_file = st.file_uploader("Cargar archivo CSV con los datos del paciente", type=["csv"])
-
-if uploaded_file is not None:
-    # Cargar el CSV original (8 columnas)
-    csv_data = pd.read_csv(uploaded_file)
-    st.write("### Datos cargados del archivo CSV (original):")
-    st.dataframe(csv_data)
-
-    # Validar que las columnas originales estén presentes
-    required_columns = [
-        'Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness',
-        'Insulin', 'BMI', 'DiabetesPedigreeFunction', 'Age'
-    ]
-    if all(col in csv_data.columns for col in required_columns):
-        # =========== Feature Engineering en la app ===========
-        # Crear Glucose2 y AgeBMI
-        csv_data['Glucose2'] = csv_data['Glucose'] ** 2
-        csv_data['AgeBMI'] = csv_data['Age'] * csv_data['BMI']
-
-        # Calcular probabilidades con el pipeline calibrado
-        # (ahora tenemos 10 columnas)
-        probabilities = model.predict_proba(csv_data[
-            required_columns + ['Glucose2', 'AgeBMI']
-        ])[:, 1]
-        
-        # Convertir probabilidad a predicción según el umbral fijo
-        pred_threshold = (probabilities >= FIXED_THRESHOLD).astype(int)
-        predictions_label = ['Diabetes' if p == 1 else 'No diabetes' for p in pred_threshold]
-
-        # Agregar las predicciones y probabilidades al DataFrame
-        csv_data['Probability'] = probabilities
-        csv_data['Prediction'] = predictions_label
-        csv_data['Threshold'] = FIXED_THRESHOLD  # Guardamos el umbral usado
-
-        # Mostrar resultados
-        st.write("### Datos con las nuevas columnas + Resultados de predicción:")
-        st.dataframe(csv_data)
-
-        # Agregar los resultados al historial
-        st.session_state['history'] = pd.concat([st.session_state['history'], csv_data], ignore_index=True)
-
-        # Gráfico de distribución de probabilidades
-        st.write("### Distribución de Probabilidades de Diabetes")
-        fig, ax = plt.subplots()
-        sns.histplot(probabilities, kde=True, ax=ax)
-        ax.set_xlabel('Probabilidad de Diabetes')
-        ax.set_ylabel('Frecuencia')
-        st.pyplot(fig)
-
-        # ============================
-        # Cálculo de FP y FN (opcional)
-        # ============================
-        if 'Outcome' in csv_data.columns:
-            # Se asume que Outcome es 0 o 1
-            y_true = csv_data['Outcome'].values
-            # Convertir Prediction (texto) a 0/1
-            y_pred = [1 if lbl == 'Diabetes' else 0 for lbl in csv_data['Prediction']]
-            
-            tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
-            
-            st.write("### Métricas de la Matriz de Confusión (con umbral fijo)")
-            st.write(f"**Falsos Positivos (FP):** {fp}")
-            st.write(f"**Falsos Negativos (FN):** {fn}")
-            st.write(f"**Verdaderos Positivos (TP):** {tp}")
-            st.write(f"**Verdaderos Negativos (TN):** {tn}")
+# Sidebar para configuración
+with st.sidebar:
+    st.header("Configuración")
+    api_url = st.text_input("URL de la API", API_BASE_URL)
+    st.info("Cambiar solo si se despliega en otro servidor")
+    st.divider()
+    st.write("Estado del servicio:")
+    try:
+        health = requests.get(f"{api_url}/health/", timeout=3)
+        if health.status_code == 200:
+            st.success("✅ API conectada correctamente")
+            model_info = health.json()
+            st.write(f"Modelo: {model_info['model_type'].split('.')[-1][:-2]}")
+            st.write(f"Versión: {model_info['model_version']}")
         else:
-            st.warning("No se encontró la columna 'Outcome' en el CSV, no se pueden calcular FP y FN.")
-    else:
-        st.error(f"El archivo CSV debe contener las columnas: {', '.join(required_columns)}")
+            st.error("❌ Error en la API")
+    except requests.exceptions.RequestException:
+        st.error("🔴 API no disponible")
 
-# Entradas manuales del usuario
-st.write("### Ingresar datos manualmente:")
-col1, col2 = st.columns(2)
+# Pestañas principales
+tab1, tab2, tab3 = st.tabs(["Predicción", "Análisis Batch", "Asistente Virtual"])
 
-with col1:
-    pregnancies = st.number_input("Número de embarazos:", min_value=0, max_value=20, value=0)
-    glucose = st.number_input("Nivel de glucosa (mg/dL):", min_value=0, max_value=600, value=120)
-    blood_pressure = st.number_input("Presión arterial (mmHg):", min_value=0, max_value=200, value=80)
-    skin_thickness = st.number_input("Espesor del pliegue cutáneo (mm):", min_value=0, max_value=100, value=20)
-
-with col2:
-    insulin = st.number_input("Nivel de insulina (mu U/ml):", min_value=0, max_value=1000, value=85)
-    bmi = st.number_input("Índice de Masa Corporal (BMI):", min_value=0.0, max_value=70.0, value=25.0, format="%.1f")
-    diabetes_pedigree = st.number_input("Función de pedigrí de diabetes:", min_value=0.0, max_value=5.0, value=0.5, format="%.2f")
-    age = st.number_input("Edad (años):", min_value=0, max_value=120, value=30)
-
-# Botón para realizar la predicción manual
-if st.button("Predecir"):
-    # Crear un DataFrame con los datos ingresados (8 columnas)
-    input_data = pd.DataFrame({
-        'Pregnancies': [pregnancies],
-        'Glucose': [glucose],
-        'BloodPressure': [blood_pressure],
-        'SkinThickness': [skin_thickness],
-        'Insulin': [insulin],
-        'BMI': [bmi],
-        'DiabetesPedigreeFunction': [diabetes_pedigree],
-        'Age': [age]
-    })
-
-    # Replicamos el feature engineering
-    input_data['Glucose2'] = input_data['Glucose'] ** 2
-    input_data['AgeBMI'] = input_data['Age'] * input_data['BMI']
-
-    # Calcular la probabilidad con el pipeline
-    probability = model.predict_proba(input_data)[0, 1]
+with tab1:
+    st.header("Predicción Individual")
     
-    # Asignar la clase según el umbral fijo
-    pred_class = 1 if probability >= FIXED_THRESHOLD else 0
-    pred_label = 'Diabetes' if pred_class == 1 else 'No diabetes'
+    with st.form("prediction_form"):
+        col1, col2 = st.columns(2)
+        with col1:
+            pregnancies = st.number_input("Embarazos:", min_value=0, max_value=20, value=0)
+            glucose = st.number_input("Glucosa (mg/dL):", min_value=0, max_value=600, value=120)
+            blood_pressure = st.number_input("Presión Arterial (mmHg):", min_value=0, max_value=200, value=80)
+            skin_thickness = st.number_input("Pliegue Cutáneo (mm):", min_value=0, max_value=100, value=20)
 
-    # Agregar los resultados al historial
-    new_entry = input_data.copy()
-    new_entry['Probability'] = probability
-    new_entry['Prediction'] = pred_label
-    new_entry['Threshold'] = FIXED_THRESHOLD
-    st.session_state['history'] = pd.concat([st.session_state['history'], new_entry], ignore_index=True)
+        with col2:
+            insulin = st.number_input("Insulina (mu U/ml):", min_value=0, max_value=1000, value=85)
+            bmi = st.number_input("Índice de Masa Corporal:", min_value=0.0, max_value=70.0, value=25.0, format="%.1f")
+            diabetes_pedigree = st.number_input("Pedigrí Diabetes:", min_value=0.0, max_value=5.0, value=0.5, format="%.2f")
+            age = st.number_input("Edad (años):", min_value=0, max_value=120, value=30)
 
-    # Mostrar resultados
-    st.write("### Resultados de la Predicción:")
-    st.write(f"**Umbral fijo:** {FIXED_THRESHOLD:.2f}")
-    st.write(f"**Probabilidad de diabetes:** {probability:.2%}")
-    st.write(f"**Diagnóstico:** {pred_label}")
+        if st.form_submit_button("Predecir Diabetes"):
+            input_data = {
+                "pregnancies": pregnancies,
+                "glucose": glucose,
+                "blood_pressure": blood_pressure,
+                "skin_thickness": skin_thickness,
+                "insulin": insulin,
+                "bmi": bmi,
+                "diabetes_pedigree": diabetes_pedigree,
+                "age": age
+            }
+            
+            try:
+                response = requests.post(PREDICT_ENDPOINT, json=input_data, timeout=10)
+                if response.status_code == 200:
+                    result = response.json()
+                    
+                    # Registrar en historial
+                    new_entry = {
+                        **input_data,
+                        "Probability": result["probabilidad_diabetes"],
+                        "Diagnóstico": result["diagnóstico"],
+                        "Threshold": result["threshold_utilizado"],
+                        "Timestamp": datetime.now().isoformat()
+                    }
+                    
+                    st.session_state.history = pd.concat([
+                        st.session_state.history,
+                        pd.DataFrame([new_entry])
+                    ], ignore_index=True)
+                    
+                    # Mostrar resultados
+                    st.subheader("Resultados")
+                    prob_percent = result["probabilidad_diabetes"] * 100
+                    diagnosis_color = "#ff4b4b" if result["diagnóstico"] == "Diabetes" else "#4CAF50"
+                    
+                    col_res1, col_res2 = st.columns(2)
+                    with col_res1:
+                        st.metric("Probabilidad de Diabetes", f"{prob_percent:.1f}%")
+                        st.metric("Diagnóstico", result["diagnóstico"], delta_color="off")
+                        
+                    with col_res2:
+                        fig, ax = plt.subplots(figsize=(4, 4))
+                        ax.pie(
+                            [result["probabilidad_diabetes"], 1 - result["probabilidad_diabetes"]],
+                            labels=["Diabetes", "No Diabetes"],
+                            colors=[diagnosis_color, "#f0f2f6"],
+                            startangle=90,
+                            autopct='%1.1f%%'
+                        )
+                        st.pyplot(fig)
+                        
+                else:
+                    st.error(f"Error en la API: {response.text}")
+                    
+            except requests.exceptions.RequestException as e:
+                st.error(f"Error de conexión: {str(e)}")
 
-    # Gráfico de probabilidad
-    st.write("### Probabilidad de Diabetes")
-    fig, ax = plt.subplots()
-    ax.bar(['No Diabetes', 'Diabetes'], [1 - probability, probability], color=['green', 'red'])
-    ax.set_ylabel('Probabilidad')
-    st.pyplot(fig)
+with tab2:
+    st.header("Análisis Batch")
+    
+    uploaded_file = st.file_uploader("Subir CSV para análisis múltiple", type=["csv"])
+    
+    if uploaded_file:
+        try:
+            df = pd.read_csv(uploaded_file)
+            required_cols = [
+                'Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness',
+                'Insulin', 'BMI', 'DiabetesPedigreeFunction', 'Age'
+            ]
+            
+            if all(col in df.columns for col in required_cols):
+                progress_bar = st.progress(0)
+                results = []
+                
+                for i, row in df.iterrows():
+                    data = row[required_cols].to_dict()
+                    response = requests.post(PREDICT_ENDPOINT, json=data)
+                    if response.status_code == 200:
+                        results.append(response.json())
+                    progress_bar.progress((i + 1) / len(df))
+                
+                # Procesar resultados
+                result_df = pd.DataFrame([{
+                    **r,
+                    "probabilidad_diabetes": r["probabilidad_diabetes"],
+                    "diagnóstico": 1 if r["diagnóstico"] == "Diabetes" else 0
+                } for r in results])
+                
+                # Mostrar análisis
+                st.subheader("Resumen Estadístico")
+                st.dataframe(result_df.describe())
+                
+                # Gráficos
+                col_hist, col_corr = st.columns(2)
+                
+                with col_hist:
+                    st.write("Distribución de Probabilidades")
+                    fig, ax = plt.subplots()
+                    sns.histplot(result_df["probabilidad_diabetes"], kde=True, ax=ax)
+                    st.pyplot(fig)
+                
+                with col_corr:
+                    st.write("Correlación de Variables")
+                    corr_matrix = df[required_cols].corr()
+                    fig, ax = plt.subplots()
+                    sns.heatmap(corr_matrix, annot=True, fmt=".2f", ax=ax)
+                    st.pyplot(fig)
+                
+            else:
+                st.error(f"CSV debe contener las columnas: {', '.join(required_cols)}")
+                
+        except Exception as e:
+            st.error(f"Error procesando archivo: {str(e)}")
 
-# Mostrar historial
-st.write("### Historial de Predicciones:")
-st.dataframe(st.session_state['history'])
+with tab3:
+    st.header("Asistente Virtual de Nutrición")
+    
+    user_query = st.chat_input("Escribe tu pregunta sobre diabetes y nutrición...")
+    
+    if user_query:
+        st.session_state.chat_history.append({"role": "user", "content": user_query})
+        
+        try:
+            response = requests.post(
+                CHAT_ENDPOINT,
+                json={"query": user_query, "max_length": 1000}
+            )
+            
+            if response.status_code == 200:
+                bot_response = response.json()["response"]
+                st.session_state.chat_history.append({"role": "assistant", "content": bot_response})
+            else:
+                st.session_state.chat_history.append({
+                    "role": "assistant",
+                    "content": "❌ Error al obtener respuesta. Intente nuevamente."
+                })
+                
+        except requests.exceptions.RequestException:
+            st.session_state.chat_history.append({
+                "role": "assistant",
+                "content": "🔴 Servicio no disponible. Intente más tarde."
+            })
+    
+    # Mostrar historial de chat
+    for msg in st.session_state.chat_history:
+        with st.chat_message(msg["role"]):
+            st.markdown(msg["content"])
 
-# Opción para descargar el historial
-if st.button("Descargar Historial como CSV"):
-    csv = st.session_state['history'].to_csv(index=False)
-    st.download_button(
-        label="Descargar CSV",
-        data=csv,
-        file_name='historial_predicciones.csv',
-        mime='text/csv',
+# Panel de historial general
+st.sidebar.divider()
+st.sidebar.header("Historial Clínico")
+
+if not st.session_state.history.empty:
+    st.sidebar.dataframe(
+        st.session_state.history[[
+            'Glucose', 'BMI', 'Age', 'Diagnóstico', 'Timestamp'
+        ]].tail(5),
+        use_container_width=True
     )
+    if st.sidebar.button("Limpiar Historial"):
+        st.session_state.history = pd.DataFrame(columns=st.session_state.history.columns)
+        st.experimental_rerun()
+else:
+    st.sidebar.info("No hay registros en el historial")
 
-# Gráfico de correlación entre variables (opcional)
-st.write("### Correlación entre Variables")
-if not st.session_state['history'].empty:
-    numeric_columns = st.session_state['history'].select_dtypes(include=['float64', 'int64']).columns
-    numeric_data = st.session_state['history'][numeric_columns]
-    
-    corr = numeric_data.corr()
-    
-    fig, ax = plt.subplots()
-    sns.heatmap(corr, annot=True, cmap='coolwarm', ax=ax)
-    st.pyplot(fig)
+# Descarga de datos
+st.sidebar.divider()
+if not st.session_state.history.empty:
+    csv = st.session_state.history.to_csv(index=False)
+    st.sidebar.download_button(
+        "Descargar Historial Completo",
+        data=csv,
+        file_name='diabedoc_historial.csv',
+        mime='text/csv'
+    )

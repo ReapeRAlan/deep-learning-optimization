@@ -1,5 +1,16 @@
 # Como instalar las herramientas (requirements.txt)
-Instalar herramientas necesarias existentes en requirements.txt:
+- Crear un entorno virtual:
+Windows: python -m venv DiabeApp
+Mac: python3 -m venv DiabeApp
+
+- Activar el entorno virtual:
+Windows: DiabeApp\Scripts\activate
+Mac: source DiabeApp/bin/activate
+
+- Desactivar entorno virtual:
+   deactivate
+
+- Instalar herramientas necesarias existentes en requirements.txt:
 pip install -r requirements.txt
 # Advanced Deep Learning Optimization Guide
 

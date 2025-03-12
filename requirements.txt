@@ -32,6 +32,7 @@ ollama==0.4.7
 packaging==24.2
 pandas==2.2.3
 pillow==11.1.0
+plotly==6.0.0
 protobuf==5.29.3
 pyarrow==19.0.1
 pydantic==2.10.6
@@ -60,5 +61,6 @@ tornado==6.4.2
 typing_extensions==4.12.2
 tzdata==2025.1
 urllib3==2.3.0
+uvicorn==0.34.0
 watchdog==6.0.0
 xgboost==2.1.4

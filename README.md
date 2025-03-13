@@ -97,19 +97,23 @@ The project utilizes **Artificial Neural Networks (ANNs)** to address supervised
   ````bash
   python -m venv DiabeApp
   DiabeApp “scripts” activate
+  ```
 - **Mac**: 
    ````bash
    python3 -m venv DiabeApp
    source DiabeApp/bin/activate
+   ```
 
 - Deactivate virtual environment:
    ````bash
    deactivate
+   ```
 
 ## Install Dependencies
 - Install the necessary tools from requirements.txt
    ````bash
    pip install -r requirements.txt
+   ```
 
 ## Deactivate virtual environment:
    ````bash

@@ -1,22 +1,18 @@
-## Funcionamiento de la Plataforma
+## Platform Operation
 
-### 1. Predicción Individual
-- Permite a los usuarios ingresar datos biométricos (embarazos, glucosa, presión arterial, etc.) para obtener una predicción sobre la probabilidad de diabetes.
-- El modelo de aprendizaje profundo procesa los datos y devuelve un diagnóstico junto con recomendaciones médicas.
+### 1. Individual Prediction
+- Allows users to input biometric data (pregnancy, glucose, blood pressure, etc.) to get a prediction on the likelihood of diabetes.
+- The deep learning model processes the data and returns a diagnosis along with medical recommendations.
 
-### 2. Análisis Masivo
-- Los usuarios pueden cargar un archivo CSV con múltiples registros de pacientes para obtener predicciones en lote.
-- La plataforma procesa los datos y genera un informe detallado con estadísticas clave, distribuciones y correlaciones.
+### 2. Massive Analysis
+- Users can upload a CSV file with multiple patient records to obtain batch predictions.
+- The platform processes the data and generates a detailed report with key statistics, distributions and correlations.
 
-### 3. Asistente Virtual
-- Un asistente basado en IA responde preguntas relacionadas con la diabetes, proporciona planes nutricionales, recomendaciones de medicación y apoyo emocional.
-- Utiliza el modelo `deepseek-r1:7b` para generar respuestas precisas y contextualizadas.
+### 3. Virtual Assistant
+- An AI-based assistant answers diabetes-related questions, provides nutritional plans, medication recommendations and emotional support.
+- It uses the `deepseek-r1:7b` model to generate accurate and contextualized answers.
 
 ---
-
-## Requisitos y Herramientas
-
-
 
 # Advanced Deep Learning Optimization Guide
 
@@ -83,40 +79,40 @@ The project utilizes **Artificial Neural Networks (ANNs)** to address supervised
    cd deep-learning-optimization
    ```
 
-### 1. Ollama y el Modelo `deepseek-r1:7b`
-- **Ollama** es una herramienta que permite ejecutar modelos de lenguaje localmente. DiabeDoc Pro utiliza el modelo `deepseek-r1:7b` para el asistente virtual.
-- Para usar Ollama y el modelo `deepseek-r1:7b`, sigue estos pasos:
+### 1. Ollama and the `deepseek-r1:7b` Model
+- Ollama** is a tool that allows you to run language models locally. DiabeDoc Pro uses the `deepseek-r1:7b` model for the virtual assistant.
+- To use Ollama and the `deepseek-r1:7b` model, follow these steps:
 
-#### Instalación de Ollama
-1. Descarga Ollama desde su [sitio oficial](https://ollama.ai/).
-2. Instala Ollama en tu sistema operativo.
-3. Descarga el modelo `deepseek-r1:7b`:
-   ```bash
+#### Ollama installation
+1. Download Ollama from its [official site](https://ollama.ai/).
+2. Install Ollama on your operating system.
+3. Download the `deepseek-r1:7b` model:
+   ````bash
    ollama pull deepseek-r1:7b
 
-## Instalación de Herramientas
+## Installation Tools
 
-### Crear un Entorno Virtual
+### Create a Virtual Environment
 - **Windows**:
-  ```bash
+  ````bash
   python -m venv DiabeApp
-  DiabeApp\Scripts\activate
+  DiabeApp “scripts” activate
 - **Mac**: 
-   ```bash
+   ````bash
    python3 -m venv DiabeApp
    source DiabeApp/bin/activate
 
-- Desactivar entorno virtual:
-   ```bash
+- Deactivate virtual environment:
+   ````bash
    deactivate
 
-## Instalar Dependencias
-- Instala las herramientas necesarias desde requirements.txt
-   ```bash
+## Install Dependencies
+- Install the necessary tools from requirements.txt
+   ````bash
    pip install -r requirements.txt
 
-## Desactivar entorno virtual:
-   ```bash
+## Deactivate virtual environment:
+   ````bash
    deactivate
 
 ## Project Workflow

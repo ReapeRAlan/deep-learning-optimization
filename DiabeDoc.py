@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 # Variables de entorno
 MODEL_PATH = os.getenv("MODEL_PATH", "diabetes_model_pipeline_calibrated.pkl")
 THRESHOLD = float(os.getenv("THRESHOLD", 0.5))
-LLM_MODEL = os.getenv("LLM_MODEL", "deepseek-r1")
+LLM_MODEL = os.getenv("LLM_MODEL", "deepseek-r1:7b")
 
 print("Iniciando DiabeDoc API...")
 

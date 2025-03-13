@@ -1,17 +1,23 @@
-# Como instalar las herramientas (requirements.txt)
-- Crear un entorno virtual:
-Windows: python -m venv DiabeApp
-Mac: python3 -m venv DiabeApp
+## Funcionamiento de la Plataforma
 
-- Activar el entorno virtual:
-Windows: DiabeApp\Scripts\activate
-Mac: source DiabeApp/bin/activate
+### 1. Predicción Individual
+- Permite a los usuarios ingresar datos biométricos (embarazos, glucosa, presión arterial, etc.) para obtener una predicción sobre la probabilidad de diabetes.
+- El modelo de aprendizaje profundo procesa los datos y devuelve un diagnóstico junto con recomendaciones médicas.
 
-- Desactivar entorno virtual:
-   deactivate
+### 2. Análisis Masivo
+- Los usuarios pueden cargar un archivo CSV con múltiples registros de pacientes para obtener predicciones en lote.
+- La plataforma procesa los datos y genera un informe detallado con estadísticas clave, distribuciones y correlaciones.
 
-- Instalar herramientas necesarias existentes en requirements.txt:
-pip install -r requirements.txt
+### 3. Asistente Virtual
+- Un asistente basado en IA responde preguntas relacionadas con la diabetes, proporciona planes nutricionales, recomendaciones de medicación y apoyo emocional.
+- Utiliza el modelo `deepseek-r1:7b` para generar respuestas precisas y contextualizadas.
+
+---
+
+## Requisitos y Herramientas
+
+
+
 # Advanced Deep Learning Optimization Guide
 
 This repository provides a sophisticated implementation of diverse deep learning models and advanced optimization methodologies, aiming to enhance accuracy and reduce training time. The project examines innovative architectures and algorithms, facilitating cutting-edge experimentation and deployment across a wide array of applications.
@@ -77,17 +83,41 @@ The project utilizes **Artificial Neural Networks (ANNs)** to address supervised
    cd deep-learning-optimization
    ```
 
-2. **Set Up a Virtual Environment**:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate   # On Linux/Mac
-   venv\Scripts\activate      # On Windows
-   ```
+### 1. Ollama y el Modelo `deepseek-r1:7b`
+- **Ollama** es una herramienta que permite ejecutar modelos de lenguaje localmente. DiabeDoc Pro utiliza el modelo `deepseek-r1:7b` para el asistente virtual.
+- Para usar Ollama y el modelo `deepseek-r1:7b`, sigue estos pasos:
 
-3. **Install Dependencies**:
+#### Instalación de Ollama
+1. Descarga Ollama desde su [sitio oficial](https://ollama.ai/).
+2. Instala Ollama en tu sistema operativo.
+3. Descarga el modelo `deepseek-r1:7b`:
+   ```bash
+   ollama pull deepseek-r1:7b
+
+## Instalación de Herramientas
+
+### Crear un Entorno Virtual
+- **Windows**:
+  ```bash
+  python -m venv DiabeApp
+  DiabeApp\Scripts\activate
+- **Mac**: 
+   ```bash
+   python3 -m venv DiabeApp
+   source DiabeApp/bin/activate
+
+- Desactivar entorno virtual:
+   ```bash
+   deactivate
+
+## Instalar Dependencias
+- Instala las herramientas necesarias desde requirements.txt
    ```bash
    pip install -r requirements.txt
-   ```
+
+## Desactivar entorno virtual:
+   ```bash
+   deactivate
 
 ## Project Workflow
 

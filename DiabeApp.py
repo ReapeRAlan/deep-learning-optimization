@@ -6,7 +6,6 @@ import plotly.figure_factory as ff
 import re
 import logging
 from datetime import datetime
-from io import StringIO
 
 # -----------------------------------------------------------------------------
 # Configuración del logger

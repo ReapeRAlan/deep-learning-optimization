@@ -96,7 +96,7 @@ The project utilizes **Artificial Neural Networks (ANNs)** to address supervised
 - **Windows**:
   ````bash
   python -m venv DiabeApp
-  DiabeApp “scripts” activate
+  DiabeApp/scripts/activate
   ```
 - **Mac**: 
    ````bash

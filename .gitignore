@@ -172,7 +172,7 @@ cython_debug/
 
 __pycache__/
 .env
-*.csv
+
 *.ckpt
 
 diabetes_model_pipeline_calibrated.pkl

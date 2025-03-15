@@ -116,7 +116,7 @@ The project utilizes **Artificial Neural Networks (ANNs)** to address supervised
    ```
 
 ## Deactivate virtual environment:
-   ````bash
+   ```bash
    deactivate
    ```
 ## Project Workflow

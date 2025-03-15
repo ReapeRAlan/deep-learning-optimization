@@ -87,31 +87,31 @@ The project utilizes **Artificial Neural Networks (ANNs)** to address supervised
 1. Download Ollama from its [official site](https://ollama.ai/).
 2. Install Ollama on your operating system.
 3. Download the `deepseek-r1:7b` model:
-   ````bash
+   ```bash
    ollama pull deepseek-r1:7b
 
 ## Installation Tools
 
 ### Create a Virtual Environment
 - **Windows**:
-  ````bash
+  ```bash
   python -m venv DiabeApp
   DiabeApp/scripts/activate
   ```
 - **Mac**: 
-   ````bash
+   ```bash
    python3 -m venv DiabeApp
    source DiabeApp/bin/activate
    ```
 
 - Deactivate virtual environment:
-   ````bash
+   ```bash
    deactivate
    ```
 
 ## Install Dependencies
 - Install the necessary tools from requirements.txt
-   ````bash
+   ```bash
    pip install -r requirements.txt
    ```
 
@@ -121,32 +121,30 @@ The project utilizes **Artificial Neural Networks (ANNs)** to address supervised
    ```
 ## Project Workflow
 
-### **1. Configuration**
+### Train the Model:
+Run the `mainALTERNATIVE.py` script to train the model:
 
-Adjust hyperparameters in the `config.py` file under the `utils/` directory to suit your requirements (e.g., learning rate, batch size, number of epochs).
-
-### **2. Execution**
-
-Run the main script to initiate training and evaluation:
+  ```bash
+  python mainALTERNATIVE.py
+  ```
+### Run API
+Once the model is trained, run the API using DiabeDoc.py:
 
 ```bash
-python main.py
+python DiabeDoc.py
 ```
 
-### **3. Results Visualization**
-
-Leverage the utilities in `plot_utils.py` to generate plots for loss, accuracy, and validation performance.
+### Deploy the Application:
+Finally, launch the Streamlit application to interact with the model:
+  ```
+  streamlit run DiabeApp.py
+  ```
 
 ---
 
 ## Prerequisites
 
 - **Python Version**: 3.8 or higher
-- Required libraries:
-
-```bash
-pip install torch numpy pandas scikit-learn matplotlib seaborn
-```
 
 ---
 

@@ -282,5 +282,5 @@ This initiative draws inspiration from significant advancements in deep learning
 
 ## Licencia
 
-Este proyecto está licenciado bajo la [Licencia de Uso Personal](./LICENSE).
+Este proyecto está licenciado bajo la [Licencia de Uso Personal](./LICENSE.md).
 

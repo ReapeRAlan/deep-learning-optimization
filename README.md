@@ -280,3 +280,7 @@ This project is distributed under the MIT License. Refer to the LICENSE file for
 
 This initiative draws inspiration from significant advancements in deep learning optimization and emphasizes practical implementations of contemporary methodologies.
 
+## Licencia
+
+Este proyecto está licenciado bajo la [Licencia de Uso Personal](./LICENSE).
+

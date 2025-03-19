@@ -1,6 +1,6 @@
 # Licencia de Uso Personal
 
-**Derechos de Autor © 2025, Alan Jesus Guerrero Sandoval && Ángel Saúl Correa Martínez**
+**Derechos de Autor © 2025, Alan Jesus Guerrero Sandoval & Ángel Saúl Correa Martínez**
 
 Se otorga permiso para ver, copiar y descargar este código fuente únicamente para uso personal y no comercial. Queda estrictamente prohibido el uso, copia, modificación o distribución de este código, en su totalidad o en parte, con fines comerciales o sin el consentimiento expreso y por escrito del autor.
 
